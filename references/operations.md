@@ -17,7 +17,7 @@ python3 scripts/intelligence.py clear --scope records
 
 `profile --file` 替换整份画像，先合并旧字段。示例：
 ```json
-{"onboarding_done":true,"market":"US","language":"zh-CN","categories":[],"price_range":null,"shipping_origin":null,"stage":"已有店铺","challenge":null}
+{"onboarding_done":true,"market":"US","language":"zh-CN","categories":[],"price_range":null,"stage":"已有店铺","challenge":null}
 ```
 首次询问后即使跳过也保存 `onboarding_done:true`。不要把文档示例当真实用户资料。
 
