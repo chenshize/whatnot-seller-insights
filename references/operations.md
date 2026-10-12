@@ -15,7 +15,7 @@ python3 scripts/intelligence.py history
 python3 scripts/intelligence.py clear --scope records
 ```
 
-`profile --file` 替换整份画像，先合并旧字段。示例：
+`profile --file` 替换整份画像，先合并仍有用的旧字段，丢弃发货地字段 `shipping_origin` 及同义字段，不从旧报告恢复该信息。读取旧画像时直接忽略这些字段，不需要为清理画像打断用户。示例：
 ```json
 {"onboarding_done":true,"market":"US","language":"zh-CN","categories":[],"price_range":null,"stage":"已有店铺","challenge":null}
 ```
@@ -42,3 +42,11 @@ python3 scripts/intelligence.py clear --scope records
 `history` 列出报告 ID 和覆盖情况；同目录 `ID-report.html` 是完整报告。日常先看 history 的未完成范围和既有报告再补查，日期重叠时按来源 URL/事实去重。clear 的 scope 可选 profile、records、all，仅删除本工具管理的记录和导出文件，不处理用户另存副本或系统备份。用户明确要求清除时执行对应范围。
 
 `finish` 接收 Agent 生成的完整 UTF-8 HTML 文档（.html 或 .htm），返回最终报告路径。提交成功后，按报告规范调用宿主预览/浏览器或系统打开能力展示该路径。打开失败不撤销已保存报告或查询进度，仅向用户提供已保存文件链接，失败原因仅记入内部记录。旧版 Markdown 报告仍保留，可阅读，也会由清除记录操作删除。
+
+## 来源完成判定
+
+`complete` 需要对该来源组的实际计划范围完成约定检查；打开了首页、搜索无结果或看不到日期，不等于完成该时间段的检查。内部 evidence 应写清检查入口、可证明的覆盖区间和已核实内容，不能只写“已浏览”。
+
+同组多个入口中有入口不可用、仅读到标题或历史区间未查明时，默认记 `partial`，保持待查起点。只有另一个可访问入口实际覆盖了缺失内容及区间，且记录了依据，才可视为已补齐；其他网站有几条消息不构成替代覆盖。相关报告照常只展示已核实信息，不展示这些内部状态。
+
+旧运行可能曾将未查完整的来源标 complete。发现这种情况时，用明确的起止日期重新检查遗漏区间并记录补查结果，不把旧状态当作覆盖证据，也不要未经检查宣称缺口已经补齐。
