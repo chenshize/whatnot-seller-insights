@@ -5,3 +5,4 @@ __pycache__/
 *-evidence.json
 *-report.md
 .DS_Store
+*-report.html

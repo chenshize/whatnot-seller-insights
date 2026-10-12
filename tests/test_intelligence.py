@@ -1,6 +1,9 @@
 import importlib.util
 from pathlib import Path
 import tempfile
+import json
+import subprocess
+import sys
 import unittest
 
 spec = importlib.util.spec_from_file_location('intel', Path(__file__).resolve().parents[1] / 'scripts/intelligence.py')
@@ -61,6 +64,26 @@ class Records(unittest.TestCase):
         self.assertIsNone(m.get(self.db,'progress:industry'))
     def test_empty_report_rejected(self):
         with self.assertRaises(ValueError):m.finish(self.db,self.run,{},' ')
+    def test_cli_exports_html_and_clears_old_and_new_reports(self):
+        root = Path(self.tmp.name) / 'cli'
+        def cli(*args):
+            return json.loads(subprocess.check_output([sys.executable, str(Path(m.__file__)), '--data-dir', str(root), *args], text=True))
+        run = cli('plan')
+        draft = Path(self.tmp.name) / 'draft.html'
+        html = '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>报告</title><body>暂无已核实的新信息。</body></html>'
+        draft.write_text(html, encoding='utf-8')
+        coverage = Path(self.tmp.name) / 'coverage.json'
+        coverage.write_text('{}')
+        result = cli('finish', run['id'], '--coverage', str(coverage), '--report', str(draft))
+        report = Path(result['report'])
+        self.assertEqual(report.suffix, '.html')
+        self.assertEqual(report.read_text(encoding='utf-8'), html)
+        legacy = root / 'old-report.md'
+        legacy.write_text('old report')
+        cli('clear', '--scope', 'records')
+        self.assertFalse(report.exists())
+        self.assertFalse(legacy.exists())
+
     def test_html_normalization(self):
         self.assertEqual(m.normalized('<p>A&nbsp; B</p><script>x</script><p>C</p>'),'A B C')
     def test_pagination_failure_preserves_partial_evidence(self):

@@ -191,9 +191,11 @@ def main():
                 path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding='utf-8')
                 result = {'evidence_file': str(path), 'status': result['status'], 'candidate_count': len(result['candidates']), 'error': result['error']}
             else:
+                if args.report.suffix.lower() not in ('.html', '.htm'):
+                    raise ValueError('Provide a complete HTML report (.html or .htm)')
                 content = args.report.read_text(encoding='utf-8')
                 finish(db, run, json.loads(args.coverage.read_text(encoding='utf-8')), content)
-                path = root / (run['id'] + '-report.md')
+                path = root / (run['id'] + '-report.html')
                 path.write_text(content, encoding='utf-8')
                 result = {'report': str(path), 'saved': True}
         elif args.command == 'history':
@@ -203,7 +205,7 @@ def main():
                 db.execute("DELETE FROM kv WHERE key='profile'")
             if args.scope in ('records', 'all'):
                 db.execute("DELETE FROM kv WHERE key!='profile'")
-                for pattern in ('*-evidence.json', '*-report.md'):
+                for pattern in ('*-evidence.json', '*-report.md', '*-report.html'):
                     for path in root.glob(pattern):
                         path.unlink()
             result = {'cleared': args.scope, 'note': 'Only this tool’s managed records; external copies/backups are unaffected.'}
