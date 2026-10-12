@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+*.sqlite3*
+*-evidence.json
+*-report.md
+.DS_Store
