@@ -15,7 +15,7 @@ python3 scripts/intelligence.py history
 python3 scripts/intelligence.py clear --scope records
 ```
 
-`profile --file` 替换整份画像，先合并仍有用的旧字段，丢弃发货地字段 `shipping_origin` 及同义字段，不从旧报告恢复该信息。读取旧画像时直接忽略这些字段，不需要为清理画像打断用户。示例：
+`profile --file` 替换整份画像，先合并仍有用的旧字段。示例：
 ```json
 {"onboarding_done":true,"market":"US","language":"zh-CN","categories":[],"price_range":null,"stage":"已有店铺","challenge":null}
 ```
